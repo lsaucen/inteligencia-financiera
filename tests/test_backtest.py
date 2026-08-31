@@ -1,6 +1,8 @@
 import pandas as pd
 
-from src.backtest import simulate_dca_from_prices
+from src.backtest import dca_all_windows, simulate_dca_from_prices
+from src.db import get_engine
+from sqlalchemy import text
 
 
 def test_dca_flat_price_no_dividends():
@@ -21,3 +23,15 @@ def test_dca_price_doubles():
     )
     result = simulate_dca_from_prices(prices, monthly_usd=100)
     assert abs(result["value"].iloc[-1] - 300) < 1e-9
+
+
+def test_dca_all_windows_includes_most_recent_window():
+    # For a monthly series of N months and a W-month window, there are
+    # N - W + 1 rolling windows; the most recent one must not be dropped.
+    with get_engine().connect() as c:
+        n_months = c.execute(
+            text("SELECT count(*) FROM v_monthly_returns WHERE ticker = 'SPY'")
+        ).scalar()
+    years = 20
+    windows = dca_all_windows("SPY", 100, years)
+    assert len(windows) == n_months - years * 12 + 1

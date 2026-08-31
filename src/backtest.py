@@ -46,7 +46,7 @@ def dca_all_windows(ticker: str, monthly_usd: float, years: int) -> pd.DataFrame
     prices = _eom_prices(ticker)
     months = years * 12
     rows = []
-    for i in range(len(prices) - months):
+    for i in range(len(prices) - months + 1):
         window = prices.iloc[i : i + months]
         res = simulate_dca_from_prices(window, monthly_usd)
         contributed = res["contributed"].iloc[-1]
