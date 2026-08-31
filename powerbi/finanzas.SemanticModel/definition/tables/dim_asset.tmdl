@@ -1,0 +1,71 @@
+/// Dimensión de activos: catálogo de los 24 instrumentos con tipo y sector.
+table dim_asset
+	lineageTag: 07f5e8bc-48dc-4005-9b6e-d4b9f8fcc30a
+
+	column asset_id
+		dataType: int64
+		isHidden
+		lineageTag: c633d544-6a01-4c3d-ae88-9dfc0e180c45
+		summarizeBy: none
+		sourceColumn: asset_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column ticker
+		dataType: string
+		lineageTag: 6f8a9f5f-1d25-4a06-8f78-ddc63026ef26
+		summarizeBy: none
+		sourceColumn: ticker
+
+		annotation SummarizationSetBy = Automatic
+
+	column name
+		dataType: string
+		lineageTag: 75b966f9-b58d-47ed-8421-76cc4b9820fc
+		summarizeBy: none
+		sourceColumn: name
+
+		annotation SummarizationSetBy = Automatic
+
+	column asset_type
+		dataType: string
+		lineageTag: 40cd1a8d-5db8-4845-9224-541c0575ab70
+		summarizeBy: none
+		sourceColumn: asset_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column sector
+		dataType: string
+		lineageTag: 63e2e353-db72-411d-9836-36ea190e94eb
+		summarizeBy: none
+		sourceColumn: sector
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: a436f303-a09b-4d60-a897-bcf74687a710
+		summarizeBy: none
+		sourceColumn: first_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column last_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 70ac7217-6bc4-42c0-9f3f-6e00ad9c8317
+		summarizeBy: none
+		sourceColumn: last_date
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_asset = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("localhost:5432", "finanzas"),
+				    dim_asset = Source{[Schema="public",Item="dim_asset"]}[Data]
+				in
+				    dim_asset

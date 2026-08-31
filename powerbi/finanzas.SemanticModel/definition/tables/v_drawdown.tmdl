@@ -1,0 +1,52 @@
+/// Drawdown diario por activo (vista SQL v_drawdown). Base de la caída máxima.
+table v_drawdown
+	lineageTag: 21c6c073-7372-4e33-8afa-623e4f153e11
+
+	measure 'Máximo drawdown' = MIN ( v_drawdown[drawdown] )
+		formatString: #,##0.0%;-#,##0.0%;#,##0.0%
+		displayFolder: Métricas
+		lineageTag: a9a96669-d462-4bcf-b12f-2c1ad070fda6
+
+	column ticker
+		dataType: string
+		lineageTag: 75d2383c-0aad-47d9-b9ec-0a52c33d315d
+		summarizeBy: none
+		sourceColumn: ticker
+
+		annotation SummarizationSetBy = Automatic
+
+	column date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 07a26db5-a044-4aad-a34c-fe4d1f6d2528
+		summarizeBy: none
+		sourceColumn: date
+
+		annotation SummarizationSetBy = Automatic
+
+	column adj_close
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: e5c48f95-6100-47ed-9e20-ea831e255c1c
+		summarizeBy: none
+		sourceColumn: adj_close
+
+		annotation SummarizationSetBy = Automatic
+
+	column drawdown
+		dataType: double
+		isHidden
+		lineageTag: 528b1a0f-894b-4d9c-b1f8-7e79a520dc60
+		summarizeBy: none
+		sourceColumn: drawdown
+
+		annotation SummarizationSetBy = Automatic
+
+	partition v_drawdown = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("localhost:5432", "finanzas"),
+				    v_drawdown = Source{[Schema="public",Item="v_drawdown"]}[Data]
+				in
+				    v_drawdown

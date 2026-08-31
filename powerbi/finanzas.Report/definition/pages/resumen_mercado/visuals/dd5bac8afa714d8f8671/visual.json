@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.0.0/schema.json",
+  "name": "dd5bac8afa714d8f8671",
+  "position": {
+    "x": 440,
+    "y": 100,
+    "z": 2,
+    "width": 400,
+    "height": 160,
+    "tabOrder": 2
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_drawdown"
+                    }
+                  },
+                  "Property": "Máximo drawdown"
+                }
+              },
+              "queryRef": "v_drawdown.Máximo drawdown",
+              "nativeQueryRef": "Máximo drawdown"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

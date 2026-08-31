@@ -1,0 +1,13 @@
+model Model
+	culture: es-ES
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: es-ES
+
+	annotation PBI_QueryOrder = ["dim_asset","v_monthly_returns","v_drawdown"]
+
+	annotation PBI_ProTooling = ["DevMode"]
+
+ref table dim_asset
+ref table v_monthly_returns
+ref table v_drawdown

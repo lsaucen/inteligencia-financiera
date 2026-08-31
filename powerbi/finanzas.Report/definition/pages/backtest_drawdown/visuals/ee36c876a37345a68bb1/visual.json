@@ -1,0 +1,71 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.0.0/schema.json",
+  "name": "ee36c876a37345a68bb1",
+  "position": {
+    "x": 660,
+    "y": 20,
+    "z": 1,
+    "width": 380,
+    "height": 680,
+    "tabOrder": 1
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_drawdown"
+                    }
+                  },
+                  "Property": "date"
+                }
+              },
+              "queryRef": "v_drawdown.date",
+              "nativeQueryRef": "date"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_drawdown"
+                    }
+                  },
+                  "Property": "Máximo drawdown"
+                }
+              },
+              "queryRef": "v_drawdown.Máximo drawdown",
+              "nativeQueryRef": "Máximo drawdown"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Evolución del drawdown en el tiempo'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

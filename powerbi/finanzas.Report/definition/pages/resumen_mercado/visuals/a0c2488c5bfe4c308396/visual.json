@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.0.0/schema.json",
+  "name": "a0c2488c5bfe4c308396",
+  "position": {
+    "x": 860,
+    "y": 100,
+    "z": 3,
+    "width": 400,
+    "height": 160,
+    "tabOrder": 3
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_monthly_returns"
+                    }
+                  },
+                  "Property": "Volatilidad anualizada"
+                }
+              },
+              "queryRef": "v_monthly_returns.Volatilidad anualizada",
+              "nativeQueryRef": "Volatilidad anualizada"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

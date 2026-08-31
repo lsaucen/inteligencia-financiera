@@ -1,0 +1,71 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.0.0/schema.json",
+  "name": "2db85aac2c9b4b219aea",
+  "position": {
+    "x": 320,
+    "y": 280,
+    "z": 4,
+    "width": 940,
+    "height": 420,
+    "tabOrder": 4
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_monthly_returns"
+                    }
+                  },
+                  "Property": "month_end"
+                }
+              },
+              "queryRef": "v_monthly_returns.month_end",
+              "nativeQueryRef": "month_end"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_monthly_returns"
+                    }
+                  },
+                  "Property": "Precio fin de mes"
+                }
+              },
+              "queryRef": "v_monthly_returns.Precio fin de mes",
+              "nativeQueryRef": "Precio fin de mes"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Precio ajustado de fin de mes (usa el filtro de activo)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

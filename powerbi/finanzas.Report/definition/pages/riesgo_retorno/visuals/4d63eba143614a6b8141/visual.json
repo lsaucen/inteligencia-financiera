@@ -1,0 +1,95 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.0.0/schema.json",
+  "name": "4d63eba143614a6b8141",
+  "position": {
+    "x": 800,
+    "y": 20,
+    "z": 1,
+    "width": 460,
+    "height": 680,
+    "tabOrder": 1
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_asset"
+                    }
+                  },
+                  "Property": "ticker"
+                }
+              },
+              "queryRef": "dim_asset.ticker",
+              "nativeQueryRef": "ticker"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_monthly_returns"
+                    }
+                  },
+                  "Property": "Retorno acumulado %"
+                }
+              },
+              "queryRef": "v_monthly_returns.Retorno acumulado %",
+              "nativeQueryRef": "Retorno acumulado %"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_monthly_returns"
+                    }
+                  },
+                  "Property": "Volatilidad anualizada"
+                }
+              },
+              "queryRef": "v_monthly_returns.Volatilidad anualizada",
+              "nativeQueryRef": "Volatilidad anualizada"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_drawdown"
+                    }
+                  },
+                  "Property": "Máximo drawdown"
+                }
+              },
+              "queryRef": "v_drawdown.Máximo drawdown",
+              "nativeQueryRef": "Máximo drawdown"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Métricas por activo'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

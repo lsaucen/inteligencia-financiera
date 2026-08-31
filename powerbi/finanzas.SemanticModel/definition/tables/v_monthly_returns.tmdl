@@ -1,0 +1,75 @@
+/// Retornos mensuales por activo (vista SQL v_monthly_returns). Base del retorno acumulado y la volatilidad.
+table v_monthly_returns
+	lineageTag: 48e37344-c19d-4799-ba72-d6502183f60c
+
+	measure 'Retorno acumulado %' = ```
+			VAR _ret =
+			    CALCULATE (
+			        PRODUCTX ( v_monthly_returns, 1 + v_monthly_returns[monthly_ret] ) - 1,
+			        v_monthly_returns[monthly_ret] <> BLANK ()
+			    )
+			RETURN
+			    _ret
+			```
+		formatString: #,##0.0%;-#,##0.0%;#,##0.0%
+		displayFolder: Métricas
+		lineageTag: ecfdd3a2-10c5-41fa-a045-d9ec56f40410
+
+	measure 'Volatilidad anualizada' = STDEV.P ( v_monthly_returns[monthly_ret] ) * SQRT ( 12 )
+		formatString: #,##0.0%;-#,##0.0%;#,##0.0%
+		displayFolder: Métricas
+		lineageTag: 76d63edb-a931-46af-8dc3-7f1ba2b4cd12
+
+	measure 'Retorno mensual medio' = AVERAGE ( v_monthly_returns[monthly_ret] )
+		formatString: #,##0.00%;-#,##0.00%;#,##0.00%
+		displayFolder: Métricas
+		lineageTag: 2d47523b-81b0-4cd3-a76c-435d5cd62ffd
+
+	measure 'Precio fin de mes' = AVERAGE ( v_monthly_returns[adj_close_eom] )
+		formatString: #,##0.00
+		displayFolder: Métricas
+		lineageTag: ba1d4b7e-3c9a-4f21-8d6e-1c2f7a9b0e44
+
+	column ticker
+		dataType: string
+		lineageTag: 15b63ef7-b06d-4ea5-98dc-3dffb9597466
+		summarizeBy: none
+		sourceColumn: ticker
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_end
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 09778db8-b595-42ee-93de-72fd797fa129
+		summarizeBy: none
+		sourceColumn: month_end
+
+		annotation SummarizationSetBy = Automatic
+
+	column adj_close_eom
+		dataType: double
+		formatString: #,##0.00
+		lineageTag: 8b04f036-5bf8-4680-ae19-e54b0470e721
+		summarizeBy: none
+		sourceColumn: adj_close_eom
+
+		annotation SummarizationSetBy = Automatic
+
+	column monthly_ret
+		dataType: double
+		isHidden
+		lineageTag: 7c6e591d-9d1d-46d2-a090-4e50146b74e2
+		summarizeBy: none
+		sourceColumn: monthly_ret
+
+		annotation SummarizationSetBy = Automatic
+
+	partition v_monthly_returns = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("localhost:5432", "finanzas"),
+				    v_monthly_returns = Source{[Schema="public",Item="v_monthly_returns"]}[Data]
+				in
+				    v_monthly_returns

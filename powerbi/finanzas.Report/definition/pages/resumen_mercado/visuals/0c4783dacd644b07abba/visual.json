@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.0.0/schema.json",
+  "name": "0c4783dacd644b07abba",
+  "position": {
+    "x": 20,
+    "y": 100,
+    "z": 1,
+    "width": 400,
+    "height": 160,
+    "tabOrder": 1
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_monthly_returns"
+                    }
+                  },
+                  "Property": "Retorno acumulado %"
+                }
+              },
+              "queryRef": "v_monthly_returns.Retorno acumulado %",
+              "nativeQueryRef": "Retorno acumulado %"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

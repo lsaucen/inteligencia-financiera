@@ -1,0 +1,7 @@
+relationship 91ff313a-12a7-4df5-b3e9-eb528b5b9835
+	fromColumn: v_monthly_returns.ticker
+	toColumn: dim_asset.ticker
+
+relationship 11076edb-f387-4e88-9e4e-b1ab02865ba0
+	fromColumn: v_drawdown.ticker
+	toColumn: dim_asset.ticker

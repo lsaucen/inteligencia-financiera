@@ -1,0 +1,89 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.0.0/schema.json",
+  "name": "a236bd791496448ba63c",
+  "position": {
+    "x": 20,
+    "y": 20,
+    "z": 0,
+    "width": 760,
+    "height": 680,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "scatterChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_asset"
+                    }
+                  },
+                  "Property": "ticker"
+                }
+              },
+              "queryRef": "dim_asset.ticker",
+              "nativeQueryRef": "ticker"
+            }
+          ]
+        },
+        "X": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_monthly_returns"
+                    }
+                  },
+                  "Property": "Volatilidad anualizada"
+                }
+              },
+              "queryRef": "v_monthly_returns.Volatilidad anualizada",
+              "nativeQueryRef": "Volatilidad anualizada"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_monthly_returns"
+                    }
+                  },
+                  "Property": "Retorno acumulado %"
+                }
+              },
+              "queryRef": "v_monthly_returns.Retorno acumulado %",
+              "nativeQueryRef": "Retorno acumulado %"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Riesgo (volatilidad) vs retorno acumulado por activo'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
