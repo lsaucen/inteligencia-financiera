@@ -19,6 +19,18 @@ Sistema de análisis de riesgo, comparación y asignación de activos construido
 
 Informe completo con métodos, robustez y limitaciones: [docs/informe-ejecutivo.md](docs/informe-ejecutivo.md).
 
+## Dashboard institucional
+
+El repositorio incluye un dashboard estático de presentación en [`dashboard/index.html`](dashboard/index.html), diseñado como terminal analítica institucional para resumir RQ1–RQ5.
+
+Para verlo localmente:
+
+```bash
+python -m http.server 8000 -d dashboard
+```
+
+Luego abre `http://localhost:8000`. La lógica analítica y la fuente de verdad siguen siendo los notebooks, SQL, tests y archivos de resultados del proyecto.
+
 ## Arquitectura
 
 ```mermaid
