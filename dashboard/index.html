@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0B0F17" />
+  <title>Market Intelligence — Financial Research Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  <style>
+    :root{
+      --canvas:#0B0F17;--surface:#111827;--panel:#131D2E;--panel2:#0D1624;
+      --border:#1F2937;--border-active:#374151;--text:#F8FAFC;--body:#D4E4FA;--muted:#64748B;
+      --primary:#10B981;--primary2:#4EDEA3;--cyan:#06B6D4;--cyan2:#4CD7F6;
+      --red:#F43F5E;--red2:#FF7886;--amber:#F59E0B;--purple:#8B5CF6;
+      --sidebar:256px;--topbar:56px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;background:var(--canvas)}
+    body{margin:0;background:var(--canvas);color:var(--body);font-family:Geist,system-ui,sans-serif;font-size:13px;line-height:1.45}
+    button,select{font:inherit}
+    a{color:inherit;text-decoration:none}
+    ::selection{background:rgba(16,185,129,.3);color:var(--text)}
+    ::-webkit-scrollbar{width:8px;height:8px}
+    ::-webkit-scrollbar-thumb{background:#263244;border-radius:8px}
+    .mono{font-family:"JetBrains Mono",monospace}
+    .caps{font:600 10px/14px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase}
+    .sidebar{
+      position:fixed;inset:0 auto 0 0;width:var(--sidebar);z-index:50;
+      display:flex;flex-direction:column;background:#06101d;border-right:1px solid var(--border)
+    }
+    .brand{height:56px;display:flex;align-items:center;gap:9px;padding:0 16px;border-bottom:1px solid var(--border)}
+    .brand-icon{width:26px;height:26px;border-radius:4px;display:grid;place-items:center;background:rgba(16,185,129,.12);border:1px solid rgba(78,222,163,.32);color:var(--primary2)}
+    .brand-title{font-size:14px;font-weight:650;color:var(--text);line-height:18px}
+    .brand-sub{font:500 10px/12px "JetBrains Mono";text-transform:uppercase;color:var(--muted);letter-spacing:.05em}
+    .nav-label{padding:20px 16px 7px;color:var(--muted)}
+    .nav{padding:0 5px;display:flex;flex-direction:column;gap:3px}
+    .nav a{min-height:36px;padding:7px 10px;border-radius:4px;display:flex;align-items:center;justify-content:space-between;color:#aebdcb;border-left:2px solid transparent}
+    .nav a:hover{background:#101c2b;color:var(--text)}
+    .nav a.active{background:#142233;color:var(--primary2);border-left-color:var(--primary);font-weight:600}
+    .nav-left{display:flex;align-items:center;gap:9px}
+    .rq{font:500 10px/14px "JetBrains Mono";padding:1px 5px;border:1px solid var(--border);border-radius:3px;color:var(--muted);background:var(--panel)}
+    .side-bottom{margin-top:auto;padding:12px;border-top:1px solid var(--border)}
+    .case-card{padding:12px;border:1px solid var(--border);border-radius:5px;background:rgba(19,29,46,.78)}
+    .case-title{font-size:12px;color:var(--text);font-weight:600;display:flex;justify-content:space-between;align-items:center}
+    .pulse{width:6px;height:6px;border-radius:50%;background:var(--primary);box-shadow:0 0 10px rgba(16,185,129,.7)}
+    .case-card p{margin:7px 0 10px;color:var(--muted);font-size:11px}
+    .case-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+    .mini-btn{padding:5px 7px;border:1px solid var(--border);border-radius:3px;background:var(--surface);font:500 10px "JetBrains Mono";text-align:center}
+    .mini-btn.primary{color:var(--primary2);border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.08)}
+    .shell{padding-left:var(--sidebar);min-height:100vh}
+    .topbar{
+      position:fixed;top:0;left:var(--sidebar);right:0;height:var(--topbar);z-index:40;
+      display:flex;align-items:center;justify-content:space-between;padding:0 16px;
+      background:rgba(11,15,23,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)
+    }
+    .context-chip{display:flex;align-items:center;gap:7px;padding:5px 8px;border:1px solid var(--border);border-radius:4px;background:var(--panel);color:var(--muted);font:500 10px "JetBrains Mono"}
+    .context-chip i{width:6px;height:6px;border-radius:50%;background:var(--primary)}
+    .top-actions{display:flex;align-items:center;gap:7px}
+    .top-btn{height:30px;padding:0 9px;border:1px solid var(--border);border-radius:4px;background:var(--surface);color:#c4d0dc;display:flex;align-items:center;gap:6px;cursor:pointer}
+    .top-btn:hover{border-color:var(--border-active);color:var(--text)}
+    .top-btn.primary{background:var(--primary);border-color:var(--primary);color:#02150d;font-weight:700}
+    .main{padding:var(--topbar) 16px 56px;max-width:1580px;margin:0 auto}
+    .hero{padding:28px 0 22px;border-bottom:1px solid var(--border)}
+    .tag-row{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+    .tag{padding:3px 7px;border-radius:3px;background:var(--panel);border:1px solid var(--border);color:var(--muted)}
+    .tag.cyan{color:var(--cyan2)} .tag.amber{color:var(--amber)}
+    .method-tag{margin-left:auto;color:var(--primary2);border-color:rgba(16,185,129,.28);background:rgba(16,185,129,.06)}
+    h1{margin:13px 0 3px;font-size:31px;line-height:39px;letter-spacing:-.025em;color:var(--text)}
+    .lede{margin:0;color:var(--muted);font-size:14px;max-width:930px}
+    .kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-top:18px}
+    .kpi{padding:12px;border:1px solid var(--border);border-radius:5px;background:rgba(19,29,46,.82);min-height:91px}
+    .kpi-head{display:flex;align-items:center;justify-content:space-between;color:var(--muted)}
+    .kpi-value{font:600 24px/30px "JetBrains Mono";letter-spacing:-.03em;color:var(--text);margin-top:8px}
+    .kpi-value.green{color:var(--primary2)} .kpi-value.cyan{color:var(--cyan2)} .kpi-value.red{color:var(--red2)}
+    .kpi-sub{color:var(--muted);font-size:11px;margin-top:2px}
+    .insights{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+    .insight{padding:12px;border:1px solid var(--border);border-radius:5px;background:var(--surface);display:flex;gap:10px}
+    .dot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex:none}
+    .insight strong{color:var(--text);font-size:12px}.insight p{margin:2px 0 0;color:var(--muted);font-size:11px}
+    .section{padding:26px 0;border-bottom:1px solid var(--border);scroll-margin-top:68px}
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:14px}
+    .section-token{display:inline-flex;gap:7px;align-items:center}
+    .rq-badge{font:600 10px "JetBrains Mono";padding:3px 6px;border-radius:3px;color:var(--primary2);background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.28)}
+    .rq-badge.refuted{color:var(--red2);background:rgba(244,63,94,.08);border-color:rgba(244,63,94,.28)}
+    .section h2{margin:6px 0 2px;color:var(--text);font-size:21px;line-height:29px;letter-spacing:-.02em}
+    .section p.section-copy{margin:0;color:var(--muted);font-size:12px}
+    .control,.segmented{border:1px solid var(--border);background:var(--panel);border-radius:4px;color:var(--text)}
+    .control{padding:6px 8px;outline:none}.control:focus{border-color:var(--cyan)}
+    .segmented{display:flex;padding:2px}
+    .segmented button{border:0;background:transparent;color:var(--muted);padding:5px 9px;border-radius:3px;cursor:pointer;font-size:11px}
+    .segmented button.active{background:#1E293B;color:var(--text);box-shadow:inset 0 0 0 1px var(--border-active)}
+    .grid-12{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px}
+    .span-8{grid-column:span 8}.span-7{grid-column:span 7}.span-5{grid-column:span 5}.span-4{grid-column:span 4}
+    .card{background:rgba(17,24,39,.86);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:5px;overflow:hidden}
+    .card-head{min-height:58px;padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .card-title{font-size:13px;color:var(--text);font-weight:650}.card-sub{font-size:10px;color:var(--muted);margin-top:2px}
+    .card-body{padding:14px}
+    .score-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .scorecards{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+    .score{padding:12px;border:1px solid var(--border);border-radius:5px;background:rgba(19,29,46,.9);cursor:pointer}
+    .score:hover{border-color:#335068}
+    .score-top{display:flex;justify-content:space-between;align-items:center}
+    .status{font:600 9px "JetBrains Mono";text-transform:uppercase;letter-spacing:.06em;border-radius:999px;padding:3px 6px}
+    .status.confirmed{color:var(--primary2);background:rgba(16,185,129,.09);border:1px solid rgba(16,185,129,.27)}
+    .status.refuted{color:var(--red2);background:rgba(244,63,94,.09);border:1px solid rgba(244,63,94,.27)}
+    .score-value{font:600 22px "JetBrains Mono";color:var(--text);margin:12px 0 4px}.score.refuted .score-value{color:var(--red2)}
+    .score-name{color:var(--text);font-weight:600;font-size:11px;min-height:34px}
+    .score-note{border-top:1px solid rgba(31,41,55,.8);padding-top:9px;margin-top:9px;color:var(--muted);font-size:10px}
+    .chart-frame{border:1px solid rgba(31,41,55,.8);background:rgba(11,15,23,.55);border-radius:4px;padding:8px}
+    svg text{user-select:none}
+    .mini-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}
+    .mini-stat{padding:8px;border:1px solid var(--border);border-radius:4px;background:var(--panel)}
+    .mini-stat .v{font:600 12px "JetBrains Mono";margin-top:3px;color:var(--text)}
+    .mini-stat .v.green{color:var(--primary2)} .mini-stat .v.red{color:var(--red2)} .mini-stat .v.cyan{color:var(--cyan2)}
+    .ranking{max-height:352px;overflow:auto}
+    .rank-row{display:grid;grid-template-columns:25px 1fr auto;gap:9px;align-items:center;padding:8px 2px;border-bottom:1px solid rgba(31,41,55,.55)}
+    .rank-no{width:21px;height:21px;display:grid;place-items:center;border-radius:3px;border:1px solid var(--border);background:var(--panel);font:600 9px "JetBrains Mono"}
+    .rank-main{color:var(--text);font-weight:600;font-size:11px}.rank-main span{color:var(--muted);font-weight:400;margin-left:4px}
+    .rank-sub{color:var(--muted);font:500 9px "JetBrains Mono";margin-top:1px}
+    .rank-val{font:600 12px "JetBrains Mono";color:var(--text)}
+    .dumbbell{padding:8px 2px}.dumb-row{display:grid;grid-template-columns:55px 1fr;gap:8px;align-items:center;margin:18px 0}
+    .dumb-asset{font:600 11px "JetBrains Mono";color:var(--text)}
+    .axis{position:relative;height:31px}.axis:before{content:"";position:absolute;left:0;right:0;top:15px;height:1px;background:var(--border)}
+    .axis-zero{position:absolute;left:50%;top:5px;bottom:5px;width:1px;background:#48566a}
+    .dumb-line{position:absolute;top:14px;height:3px;background:#536075;border-radius:2px}
+    .dumb-dot{position:absolute;top:10px;width:11px;height:11px;border-radius:50%;transform:translateX(-50%)}
+    .dot-low{background:var(--cyan2)}.dot-high{background:var(--amber)}
+    .evidence{display:grid;gap:8px}.ev{padding:9px;border:1px solid var(--border);border-radius:4px;background:var(--panel)}
+    .ev-head{display:flex;justify-content:space-between;color:var(--muted);font-size:9px}.ev-value{font:600 12px "JetBrains Mono";color:var(--text);margin-top:3px}
+    .dca-bars{display:grid;gap:16px}.dca-row{display:grid;grid-template-columns:58px 1fr;gap:10px;align-items:center}
+    .dca-name{font:600 11px "JetBrains Mono";color:var(--text)}
+    .range{position:relative;height:31px;border:1px solid var(--border);border-radius:3px;background:var(--panel2)}
+    .range-line{position:absolute;top:14px;height:2px;background:#596579}.range-box{position:absolute;top:8px;height:14px;border:1px solid var(--cyan2);background:rgba(6,182,212,.24)}
+    .range-dot{position:absolute;top:8px;width:4px;height:14px;background:var(--primary2);transform:translateX(-50%)}
+    .range-label{position:absolute;top:-13px;transform:translateX(-50%);font:600 9px "JetBrains Mono";color:var(--primary2)}
+    .bar-row{margin:13px 0}.bar-head{display:flex;justify-content:space-between;font:500 10px "JetBrains Mono";color:var(--muted);margin-bottom:5px}
+    .bar-track{height:12px;border:1px solid var(--border);border-radius:3px;background:var(--panel2);overflow:hidden}.bar-fill{height:100%}
+    .benchmark-track{position:relative;height:28px;border:1px solid var(--border);border-radius:3px;background:var(--panel2);overflow:hidden}.benchmark-track:after{content:"";position:absolute;top:0;bottom:0;left:50%;border-left:1px dashed #596579}
+    .benchmark-fill{height:100%;background:linear-gradient(90deg,rgba(16,185,129,.65),rgba(78,222,163,.95))}
+    .momentum-row{margin:14px 0}.mom-track{position:relative;height:29px;border:1px solid var(--border);border-radius:3px;background:var(--panel2)}.mom-track:after{content:"";position:absolute;top:0;bottom:0;left:50%;width:1px;background:#536075}
+    .mom-bar{position:absolute;top:7px;height:13px;border-radius:2px}.mom-bar.neg{right:50%;background:rgba(244,63,94,.75)}.mom-bar.pos{left:50%;background:rgba(16,185,129,.75)}
+    .footer{margin-top:24px;padding:15px;border:1px solid var(--border);border-radius:5px;background:rgba(19,29,46,.88);display:flex;justify-content:space-between;gap:18px;align-items:center}
+    .stack{display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end}.stack span{padding:4px 7px;border:1px solid var(--border);border-radius:3px;background:var(--surface);font:500 9px "JetBrains Mono"}
+    .method-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+    .method-box{padding:9px;border:1px solid var(--border);border-radius:4px;background:var(--panel)}
+    .method-box strong{display:block;color:var(--text);font-size:10px}.method-box span{display:block;margin-top:3px;color:var(--muted);font-size:9px}
+    @media(max-width:1100px){
+      :root{--sidebar:210px}.kpis{grid-template-columns:repeat(3,1fr)}.scorecards{grid-template-columns:repeat(3,1fr)}
+      .span-8,.span-7{grid-column:span 12}.span-4,.span-5{grid-column:span 12}
+    }
+    @media(max-width:760px){
+      :root{--sidebar:0px}.sidebar{display:none}.topbar{left:0}.main{padding-left:12px;padding-right:12px}
+      .context-chip{display:none}.kpis{grid-template-columns:repeat(2,1fr)}.insights,.scorecards,.method-grid{grid-template-columns:1fr}
+      .section-head{align-items:flex-start;flex-direction:column}.top-btn span.label{display:none}.footer{align-items:flex-start;flex-direction:column}.stack{justify-content:flex-start}
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon"><span class="material-symbols-outlined" style="font-size:17px">query_stats</span></div>
+      <div><div class="brand-title">Market Intelligence</div><div class="brand-sub">Quantitative Engine</div></div>
+    </div>
+    <div class="nav-label caps">Market Research</div>
+    <nav class="nav">
+      <a href="#overview" data-section="overview" class="active"><span class="nav-left"><span class="material-symbols-outlined" style="font-size:17px">grid_view</span>Overview</span></a>
+      <a href="#risk" data-section="risk"><span class="nav-left"><span class="material-symbols-outlined" style="font-size:17px">show_chart</span>Risk & Return</span><span class="rq">RQ1</span></a>
+      <a href="#regimes" data-section="regimes"><span class="nav-left"><span class="material-symbols-outlined" style="font-size:17px">waterfall_chart</span>Macro Regimes</span><span class="rq">RQ2</span></a>
+      <a href="#dca" data-section="dca"><span class="nav-left"><span class="material-symbols-outlined" style="font-size:17px">calendar_today</span>Dollar-Cost Averaging</span><span class="rq">RQ3</span></a>
+      <a href="#benchmark" data-section="benchmark"><span class="nav-left"><span class="material-symbols-outlined" style="font-size:17px">compare_arrows</span>Benchmark Consistency</span><span class="rq">RQ4</span></a>
+      <a href="#momentum" data-section="momentum"><span class="nav-left"><span class="material-symbols-outlined" style="font-size:17px">speed</span>Momentum</span><span class="rq">RQ5</span></a>
+    </nav>
+    <div class="side-bottom">
+      <div class="case-card">
+        <div class="case-title">Portfolio Case Study <i class="pulse"></i></div>
+        <p>Historical market research across 24 assets, macro regimes and reproducible statistical backtests.</p>
+        <div class="case-actions">
+          <a class="mini-btn" href="#methodology">Methodology</a>
+          <a class="mini-btn primary" href="https://lsaucen.github.io/">Main Portfolio</a>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="shell">
+    <header class="topbar">
+      <div class="context-chip"><i></i><span>1999–2026 sector sample · historical market research · not investment advice</span></div>
+      <div class="top-actions">
+        <a class="top-btn" href="#methodology"><span class="material-symbols-outlined" style="font-size:16px">menu_book</span><span class="label">Methodology</span></a>
+        <div class="top-btn mono"><span style="width:6px;height:6px;border-radius:50%;background:var(--cyan)"></span>Historical Data</div>
+        <a class="top-btn" href="https://github.com/lsaucen/inteligencia-financiera" target="_blank" rel="noreferrer"><span class="material-symbols-outlined" style="font-size:16px">code</span></a>
+        <a class="top-btn primary" href="https://lsaucen.github.io/"><span class="material-symbols-outlined" style="font-size:16px">account_balance_wallet</span><span class="label">Portfolio</span></a>
+      </div>
+    </header>
+
+    <main class="main">
+      <section id="overview" class="hero">
+        <div class="tag-row">
+          <span class="tag caps">Historical Market Research</span>
+          <span class="tag cyan caps">1999–2026 Sector Sample</span>
+          <span class="tag amber caps">Not Investment Advice</span>
+          <span class="tag method-tag mono">A-priori hypothesis design · RQ1–RQ5</span>
+        </div>
+        <h1>Financial intelligence research dashboard</h1>
+        <p class="lede">Five research questions spanning risk, macro regimes, dollar-cost averaging, benchmark consistency and sector momentum. Results are tied directly to the reproducible notebooks in this repository.</p>
+
+        <div class="kpis">
+          <div class="kpi"><div class="kpi-head caps"><span>Assets analyzed</span><span class="material-symbols-outlined" style="font-size:15px">dataset</span></div><div class="kpi-value">24</div><div class="kpi-sub">ETFs + reference stocks</div></div>
+          <div class="kpi"><div class="kpi-head caps"><span>Macro series</span><span class="material-symbols-outlined" style="font-size:15px">account_balance</span></div><div class="kpi-value">4</div><div class="kpi-sub">CPI, Fed, Treasury, jobs</div></div>
+          <div class="kpi"><div class="kpi-head caps"><span>Max history</span><span class="material-symbols-outlined" style="font-size:15px">history</span></div><div class="kpi-value">64y</div><div class="kpi-sub">Asset-dependent coverage</div></div>
+          <div class="kpi"><div class="kpi-head caps"><span>Vol vs Sharpe</span><span class="material-symbols-outlined" style="font-size:15px">analytics</span></div><div class="kpi-value green">-0.85</div><div class="kpi-sub">Spearman rho · p=.004</div></div>
+          <div class="kpi"><div class="kpi-head caps"><span>QQQ 5y win rate</span><span class="material-symbols-outlined" style="font-size:15px">trending_up</span></div><div class="kpi-value cyan">84.4%</div><div class="kpi-sub">vs SPY · 269 windows</div></div>
+          <div class="kpi"><div class="kpi-head caps"><span>Momentum spread</span><span class="material-symbols-outlined" style="font-size:15px">speed</span></div><div class="kpi-value red">-1.06%</div><div class="kpi-sub">Annualized · before costs</div></div>
+        </div>
+
+        <div class="insights">
+          <div class="insight"><span class="dot" style="background:var(--primary)"></span><div><strong>Asset choice dominated timing</strong><p>The destination effect was 4.1× the start-date dispersion at 10 years and 10.3× at 20 years.</p></div></div>
+          <div class="insight"><span class="dot" style="background:var(--cyan)"></span><div><strong>Diversification depended on regime</strong><p>SPY–TLT correlation moved from -0.282 in low inflation to +0.088 in high inflation.</p></div></div>
+          <div class="insight"><span class="dot" style="background:var(--amber)"></span><div><strong>Two hypotheses failed</strong><p>Technology outperformance survived testing; mechanical sector momentum did not.</p></div></div>
+        </div>
+      </section>
+
+      <section class="section" aria-label="Hypothesis scorecards">
+        <div class="score-title"><span class="caps" style="color:var(--muted)">Hypothesis scorecards · formal backtest findings</span><span class="mono" style="font-size:10px;color:var(--muted)">Bonferroni α = 0.0029 · 17 comparisons</span></div>
+        <div class="scorecards">
+          <div class="score" data-jump="risk"><div class="score-top"><span class="rq-badge">RQ1</span><span class="status confirmed">Confirmed</span></div><div class="score-value">ρ = -0.85</div><div class="score-name">Extra sector risk was not rewarded</div><div class="score-note">Volatility vs Sharpe · p = 0.004</div></div>
+          <div class="score" data-jump="regimes"><div class="score-top"><span class="rq-badge">RQ2</span><span class="status confirmed">Confirmed</span></div><div class="score-value">-0.28 → +0.09</div><div class="score-name">Bond protection weakened with inflation</div><div class="score-note">SPY–TLT: low vs high inflation</div></div>
+          <div class="score" data-jump="dca"><div class="score-top"><span class="rq-badge">RQ3</span><span class="status confirmed">Confirmed</span></div><div class="score-value">4.1× / 10.3×</div><div class="score-name">Destination mattered more than timing</div><div class="score-note">Destination effect vs start-date dispersion</div></div>
+          <div class="score refuted" data-jump="benchmark"><div class="score-top"><span class="rq-badge refuted">RQ4</span><span class="status refuted">Refuted</span></div><div class="score-value">84.4%</div><div class="score-name">Persistent outperformance was concentrated</div><div class="score-note">QQQ beat SPY in 5-year windows</div></div>
+          <div class="score refuted" data-jump="momentum"><div class="score-top"><span class="rq-badge refuted">RQ5</span><span class="status refuted">Refuted</span></div><div class="score-value">-1.06%</div><div class="score-name">Sector momentum did not add value</div><div class="score-note">Annualized top-minus-bottom spread</div></div>
+        </div>
+      </section>
+
+      <section id="risk" class="section">
+        <div class="section-head">
+          <div><div class="section-token"><span class="rq-badge">RQ1 · RISK & RETURN</span><span class="caps" style="color:var(--muted)">Cross-sectional volatility analysis</span></div><h2>More sector volatility did not buy better risk-adjusted return</h2><p class="section-copy">Exact sector statistics from the research notebook. Toggle the vertical metric to compare Sharpe, gross CAGR and Sortino.</p></div>
+          <div class="segmented" id="riskMetric"><button data-metric="sharpe" class="active">Sharpe ratio</button><button data-metric="return">Gross CAGR</button><button data-metric="sortino">Sortino</button></div>
+        </div>
+        <div class="grid-12">
+          <div class="card span-8"><div class="card-head"><div><div class="card-title">Sector risk map</div><div class="card-sub">X = annualized volatility · bubble = sector ETF</div></div><span class="mono" style="font-size:10px;color:var(--muted)">ρ = -0.850 · p = 0.004</span></div><div class="card-body"><div id="riskChart" class="chart-frame"></div><div class="mini-stats"><div class="mini-stat"><div class="caps" style="color:var(--muted)">Best Sharpe</div><div class="v green">XLV · 0.642</div></div><div class="mini-stat"><div class="caps" style="color:var(--muted)">Worst Sharpe</div><div class="v red">XLF · 0.386</div></div><div class="mini-stat"><div class="caps" style="color:var(--muted)">Spearman Rank</div><div class="v cyan">ρ = -0.850</div></div></div></div></div>
+          <div class="card span-4"><div class="card-head"><div><div class="card-title">Sector ranking</div><div class="card-sub">Sharpe ratio with annual return & volatility</div></div><span class="material-symbols-outlined" style="color:var(--muted);font-size:18px">format_list_numbered</span></div><div class="card-body ranking" id="ranking"></div></div>
+        </div>
+      </section>
+
+      <section id="regimes" class="section">
+        <div class="section-head"><div><div class="section-token"><span class="rq-badge">RQ2 · MACRO REGIMES</span><span class="caps" style="color:var(--muted)">Inflation-driven asset decoupling</span></div><h2>Bond diversification changed when inflation changed</h2><p class="section-copy">Correlation against SPY by inflation regime. Low and high inflation regimes each contain 144 monthly observations.</p></div></div>
+        <div class="grid-12">
+          <div class="card span-8"><div class="card-head"><div><div class="card-title">Correlation regime shift</div><div class="card-sub">288 monthly observations · median inflation threshold = 2.33%</div></div><div class="mono" style="font-size:10px"><span style="color:var(--cyan2)">● Low</span> &nbsp; <span style="color:var(--amber)">● High</span></div></div><div class="card-body"><div id="regimeChart" class="dumbbell"></div></div></div>
+          <div class="card span-4"><div class="card-head"><div><div class="card-title">Robustness checks</div><div class="card-sub">SPY–TLT sensitivity across alternative specifications</div></div></div><div class="card-body evidence"><div class="ev"><div class="ev-head"><span>Headline test</span><span style="color:var(--primary2)">●</span></div><div class="ev-value">z = 3.18 · p = 0.0015</div><div class="card-sub">High vs low inflation</div></div><div class="ev"><div class="ev-head"><span>CPI lagged 1 month</span><span style="color:var(--primary2)">●</span></div><div class="ev-value">p = 0.0141</div><div class="card-sub">+0.040 vs -0.247 correlation</div></div><div class="ev"><div class="ev-head"><span>2002–2014</span></div><div class="ev-value">-0.389 vs -0.256</div><div class="card-sub">Negative in both inflation regimes</div></div><div class="ev"><div class="ev-head"><span>2015–2026</span><span style="color:var(--primary2)">●</span></div><div class="ev-value">+0.541 vs -0.353</div><div class="card-sub">Large regime divergence</div></div></div></div>
+        </div>
+      </section>
+
+      <section id="dca" class="section">
+        <div class="section-head"><div><div class="section-token"><span class="rq-badge">RQ3 · DOLLAR-COST AVERAGING</span><span class="caps" style="color:var(--muted)">Destination & systematic effect</span></div><h2>Where you invested mattered more than exactly when you started</h2><p class="section-copy">Distribution of final portfolio value divided by total contributed capital across every historical start window.</p></div><select class="control mono" id="dcaHorizon"><option value="20y">20 years</option><option value="10y">10 years</option></select></div>
+        <div class="card"><div class="card-head"><div><div class="card-title">DCA outcome distributions</div><div class="card-sub">Whisker = p5–p95 · box = p25–p75 · marker = median</div></div><span class="rq-badge">All start dates evaluated</span></div><div class="card-body"><div id="dcaChart" class="dca-bars"></div><div class="mini-stats"><div class="mini-stat"><div class="caps" style="color:var(--muted)">Destination / timing effect</div><div class="v green" id="dcaRatio">10.3× ratio</div></div><div class="mini-stat"><div class="caps" style="color:var(--muted)">Friedman test</div><div class="v">p = 4.04e-13</div></div><div class="mini-stat"><div class="caps" style="color:var(--muted)">20y nominal losses</div><div class="v cyan">None observed</div></div></div></div></div>
+        <div class="grid-12" style="margin-top:14px">
+          <div class="card span-5"><div class="card-head"><div><div class="card-title">DCA vs lump sum · SPY · 10 years</div><div class="card-sub">Return versus dispersion trade-off</div></div></div><div class="card-body"><div class="mini-stats" style="grid-template-columns:1fr 1fr"><div class="mini-stat"><div class="caps" style="color:var(--muted)">Lump-sum median</div><div class="v">2.29×</div><div class="card-sub">Std dev 0.94</div></div><div class="mini-stat"><div class="caps" style="color:var(--muted)">DCA median</div><div class="v green">1.66×</div><div class="card-sub">Std dev 0.39</div></div></div><div class="ev" style="margin-top:9px"><div class="card-sub">Lump sum finished ahead in <strong style="color:var(--text)">90.8%</strong> of 284 ten-year windows, while DCA reduced outcome dispersion substantially.</div></div></div></div>
+          <div class="card span-7"><div class="card-head"><div><div class="card-title">20-year median multiples</div><div class="card-sub">Final value ÷ contributed capital</div></div></div><div class="card-body"><div class="bar-row"><div class="bar-head"><span>QQQ</span><strong style="color:var(--cyan2)">6.40×</strong></div><div class="bar-track"><div class="bar-fill" style="width:91%;background:var(--cyan)"></div></div></div><div class="bar-row"><div class="bar-head"><span>GLD</span><strong style="color:var(--amber)">2.77×</strong></div><div class="bar-track"><div class="bar-fill" style="width:39.5%;background:var(--amber)"></div></div></div><div class="bar-row"><div class="bar-head"><span>SPY</span><strong style="color:var(--primary2)">2.69×</strong></div><div class="bar-track"><div class="bar-fill" style="width:38.4%;background:var(--primary)"></div></div></div><div class="bar-row"><div class="bar-head"><span>60/40</span><strong style="color:var(--purple)">2.57×</strong></div><div class="bar-track"><div class="bar-fill" style="width:36.7%;background:var(--purple)"></div></div></div></div></div>
+        </div>
+      </section>
+
+      <section id="benchmark" class="section">
+        <div class="section-head"><div><div class="section-token"><span class="rq-badge refuted">RQ4 · BENCHMARK CONSISTENCY</span><span class="caps" style="color:var(--muted)">Rolling comparative windows</span></div><h2>Beating SPY consistently was possible—but concentrated in technology</h2><p class="section-copy">Share of rolling windows in which each ETF outperformed SPY. Five-year estimates include block-bootstrap confidence intervals.</p></div><select class="control mono" id="benchmarkWindow"><option value="5y">5-year rolling</option><option value="1y">1-year rolling</option><option value="10y">10-year rolling</option></select></div>
+        <div class="card"><div class="card-head"><div><div class="card-title">Outperformance consistency</div><div class="card-sub">Win rate against SPY across rolling windows</div></div><span class="mono" style="font-size:10px;color:var(--muted)">50% = parity</span></div><div class="card-body" id="benchmarkBars"></div></div>
+      </section>
+
+      <section id="momentum" class="section">
+        <div class="section-head"><div><div class="section-token"><span class="rq-badge refuted">RQ5 · MOMENTUM</span><span class="caps" style="color:var(--muted)">Statistical non-significance</span></div><h2>Mechanical sector rotation failed the robustness test</h2><p class="section-copy">Top-minus-bottom sector momentum spreads across formation windows. Every block-bootstrap interval contains zero.</p></div><select class="control mono" id="momentumFormation"><option value="6m">6 months formation</option><option value="3m">3 months formation</option><option value="12m">12 months formation</option></select></div>
+        <div class="grid-12">
+          <div class="card span-8"><div class="card-head"><div><div class="card-title">Momentum spread by formation period</div><div class="card-sub">Annualized top-tercile minus bottom-tercile return</div></div><span class="status refuted">All CIs cross zero</span></div><div class="card-body" id="momentumBars"></div></div>
+          <div class="card span-4"><div class="card-head"><div><div class="card-title">Selected formation window</div><div class="card-sub">Robustness metrics</div></div><span class="material-symbols-outlined" style="font-size:17px;color:var(--red2)">warning</span></div><div class="card-body evidence" id="momentumDetail"></div></div>
+        </div>
+      </section>
+
+      <section id="methodology" class="section">
+        <div class="section-head"><div><div class="section-token"><span class="rq-badge">METHODOLOGY</span><span class="caps" style="color:var(--muted)">Reproducible research architecture</span></div><h2>Designed to make the analysis auditable</h2><p class="section-copy">Hypotheses are defined before calculation, signal construction avoids look-ahead and statistical uncertainty is reported rather than hidden.</p></div></div>
+        <div class="method-grid">
+          <div class="method-box"><strong>Sources</strong><span>Yahoo Finance prices/dividends + FRED macro series.</span></div>
+          <div class="method-box"><strong>Data layer</strong><span>Idempotent PostgreSQL ETL + SQL window-function views.</span></div>
+          <div class="method-box"><strong>Inference</strong><span>Block bootstrap, non-parametric tests and Bonferroni correction.</span></div>
+          <div class="method-box"><strong>Delivery</strong><span>Research notebooks, Streamlit app and version-controlled Power BI project.</span></div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div style="display:flex;gap:11px;align-items:flex-start;max-width:760px"><div class="brand-icon"><span class="material-symbols-outlined" style="font-size:17px">terminal</span></div><div><div class="card-title">Reproducible research architecture</div><div class="card-sub" style="margin-top:4px;line-height:1.55">This dashboard is a presentation layer over the project's tested research outputs. Historical regularities are descriptive and do not constitute investment recommendations.</div></div></div>
+        <div class="stack"><span>Python 3.12</span><span>PostgreSQL 16</span><span>SQL window functions</span><span>SciPy</span><span>Bootstrap</span><span>Streamlit</span><span>Power BI</span><span style="color:var(--primary2)">pytest</span></div>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    const sector = [
+      {t:'XLV',s:'Health Care',r:9.1,v:14.2,sh:.642,so:.749},
+      {t:'XLP',s:'Consumer Staples',r:7.2,v:12.4,sh:.581,so:.688},
+      {t:'XLI',s:'Industrials',r:10.8,v:18.7,sh:.578,so:.718},
+      {t:'XLY',s:'Consumer Discretionary',r:10.9,v:19.2,sh:.571,so:.699},
+      {t:'XLU',s:'Utilities',r:8.6,v:15.2,sh:.567,so:.650},
+      {t:'XLK',s:'Technology',r:12.6,v:23.1,sh:.546,so:.700},
+      {t:'XLB',s:'Materials',r:9.9,v:20.7,sh:.479,so:.631},
+      {t:'XLE',s:'Energy',r:11.4,v:24.9,sh:.455,so:.576},
+      {t:'XLF',s:'Financials',r:8.1,v:20.9,sh:.386,so:.452}
+    ];
+    const regime = [
+      {a:'TLT',low:-.282,high:.088},{a:'AGG',low:-.002,high:.401},
+      {a:'SHY',low:-.232,high:-.037},{a:'GLD',low:-.017,high:.177}
+    ];
+    const dca = {
+      '10y':[
+        {a:'SPY',n:284,p5:1.02,p25:1.33,m:1.66,p75:1.94,p95:2.23},
+        {a:'QQQ',n:210,p5:1.14,p25:1.77,m:2.28,p75:2.68,p95:3.22},
+        {a:'GLD',n:142,p5:.99,p25:1.08,m:1.25,p75:1.38,p95:2.39},
+        {a:'60/40',n:155,p5:1.43,p25:1.50,m:1.56,p75:1.63,p95:1.73}
+      ],
+      '20y':[
+        {a:'SPY',n:164,p5:2.09,p25:2.30,m:2.69,p75:3.62,p95:4.39},
+        {a:'QQQ',n:90,p5:3.91,p25:5.14,m:6.40,p75:7.16,p95:8.16},
+        {a:'GLD',n:22,p5:2.26,p25:2.56,m:2.77,p75:3.21,p95:3.58},
+        {a:'60/40',n:35,p5:2.25,p25:2.46,m:2.57,p75:2.70,p95:2.78}
+      ]
+    };
+    const benchmark = {
+      '1y':[{t:'QQQ',w:.67},{t:'XLK',w:.63},{t:'VTI',w:.55},{t:'XLV',w:.47}],
+      '5y':[{t:'QQQ',w:.844,lo:.699,hi:.959},{t:'XLK',w:.765,lo:.595,hi:.904},{t:'XLV',w:.596,lo:.423,hi:.750},{t:'VTI',w:.545,lo:.368,hi:.744}],
+      '10y':[{t:'QQQ',w:.89},{t:'XLK',w:.79},{t:'XLV',w:.75},{t:'VTI',w:.58}]
+    };
+    const momentum = {
+      '3m':{annual:-.0067,lo:-.0038,hi:.0030,n:327,rising:null,falling:null},
+      '6m':{annual:-.0106,lo:-.0047,hi:.0029,n:324,rising:.0082,falling:-.0314},
+      '12m':{annual:.0052,lo:-.0037,hi:.0045,n:318,rising:null,falling:null}
+    };
+
+    function pctPos(v,min,max){return Math.max(0,Math.min(100,(v-min)/(max-min)*100))}
+    function riskColor(row){ if(row.sh>=.56)return '#4EDEA3'; if(row.sh>=.50)return '#4CD7F6'; if(row.sh>=.46)return '#F59E0B'; return '#FF7886'; }
+
+    function renderRisk(metric){
+      const cfg = metric==='sharpe' ? {key:'sh',min:.32,max:.68,fmt:v=>v.toFixed(1)} :
+                  metric==='return' ? {key:'r',min:5,max:14,fmt:v=>v+'%'} :
+                  {key:'so',min:.4,max:.8,fmt:v=>v.toFixed(1)};
+      let svg='<svg viewBox="0 0 720 270" width="100%" height="270" role="img" aria-label="Sector volatility scatter plot">';
+      [0,.25,.5,.75,1].forEach(function(q){
+        const y=25+q*205; svg+='<line x1="55" x2="690" y1="'+y+'" y2="'+y+'" stroke="#1F2937" stroke-dasharray="3 3"/>';
+        const val=cfg.max-q*(cfg.max-cfg.min); svg+='<text x="43" y="'+(y+4)+'" text-anchor="end" fill="#64748B" font-size="10" font-family="JetBrains Mono">'+cfg.fmt(val)+'</text>';
+      });
+      [10,15,20,25].forEach(function(v){const x=55+pctPos(v,10,27)*6.35;svg+='<line x1="'+x+'" x2="'+x+'" y1="25" y2="230" stroke="#1F2937" stroke-dasharray="3 3"/><text x="'+x+'" y="250" text-anchor="middle" fill="#64748B" font-size="10" font-family="JetBrains Mono">'+v+'%</text>';});
+      sector.forEach(function(row){
+        const x=55+pctPos(row.v,10,27)*6.35;
+        const y=25+(1-pctPos(row[cfg.key],cfg.min,cfg.max)/100)*205;
+        const color=riskColor(row);
+        svg+='<circle cx="'+x+'" cy="'+y+'" r="6" fill="'+color+'" stroke="#0B0F17" stroke-width="2"/><text x="'+x+'" y="'+(y-10)+'" text-anchor="middle" fill="#D4E4FA" font-size="9" font-weight="600" font-family="JetBrains Mono">'+row.t+'</text>';
+      });
+      svg+='</svg>';
+      document.getElementById('riskChart').innerHTML=svg;
+    }
+
+    function renderRanking(){
+      const rows=[].concat(sector).sort(function(a,b){return b.sh-a.sh});
+      document.getElementById('ranking').innerHTML=rows.map(function(r,i){
+        const rankColor=i===0?'color:var(--primary2);border-color:rgba(16,185,129,.35)':i===rows.length-1?'color:var(--red2);border-color:rgba(244,63,94,.35)':'';
+        return '<div class="rank-row"><div class="rank-no" style="'+rankColor+'">'+(i+1)+'</div><div><div class="rank-main">'+r.t+' <span>'+r.s+'</span></div><div class="rank-sub">'+r.r.toFixed(1)+'% return · '+r.v.toFixed(1)+'% vol</div></div><div class="rank-val">'+r.sh.toFixed(3)+'</div></div>';
+      }).join('');
+    }
+
+    function renderRegime(){
+      const el=document.getElementById('regimeChart');
+      el.innerHTML=regime.map(function(r){
+        const low=pctPos(r.low,-.5,.5), high=pctPos(r.high,-.5,.5), left=Math.min(low,high), width=Math.abs(high-low);
+        return '<div class="dumb-row"><div class="dumb-asset">'+r.a+'</div><div class="axis"><div class="axis-zero"></div><div class="dumb-line" style="left:'+left+'%;width:'+width+'%"></div><div class="dumb-dot dot-low" style="left:'+low+'%" title="Low inflation '+r.low.toFixed(3)+'"></div><div class="dumb-dot dot-high" style="left:'+high+'%" title="High inflation '+r.high.toFixed(3)+'"></div><span class="mono" style="position:absolute;left:'+low+'%;top:-7px;transform:translateX(-50%);font-size:9px;color:var(--cyan2)">'+r.low.toFixed(3)+'</span><span class="mono" style="position:absolute;left:'+high+'%;top:22px;transform:translateX(-50%);font-size:9px;color:var(--amber)">'+(r.high>0?'+':'')+r.high.toFixed(3)+'</span></div></div>';
+      }).join('');
+    }
+
+    function renderDca(h){
+      const rows=dca[h], min=.5, max=h==='20y'?8.5:3.5;
+      document.getElementById('dcaChart').innerHTML=rows.map(function(r){
+        const p5=pctPos(r.p5,min,max),p25=pctPos(r.p25,min,max),med=pctPos(r.m,min,max),p75=pctPos(r.p75,min,max),p95=pctPos(r.p95,min,max);
+        return '<div class="dca-row"><div class="dca-name">'+r.a+'<div class="card-sub">n='+r.n+'</div></div><div class="range"><div class="range-line" style="left:'+p5+'%;width:'+(p95-p5)+'%"></div><div class="range-box" style="left:'+p25+'%;width:'+(p75-p25)+'%"></div><div class="range-dot" style="left:'+med+'%"></div><div class="range-label" style="left:'+med+'%">'+r.m.toFixed(2)+'×</div></div></div>';
+      }).join('');
+      document.getElementById('dcaRatio').textContent=h==='20y'?'10.3× ratio':'4.1× ratio';
+    }
+
+    function renderBenchmark(w){
+      const rows=benchmark[w];
+      document.getElementById('benchmarkBars').innerHTML=rows.map(function(r){
+        let ci='';
+        if(r.lo!==undefined){ci='<div style="position:absolute;left:'+(r.lo*100)+'%;top:12px;height:3px;width:'+((r.hi-r.lo)*100)+'%;background:#E2E8F0;z-index:2;border-radius:2px" title="Bootstrap CI"></div>'}
+        return '<div class="bar-row"><div class="bar-head"><span><strong style="color:var(--text)">'+r.t+'</strong></span><strong style="color:'+(r.w>=.7?'var(--primary2)':'var(--body)')+'">'+(r.w*100).toFixed(1)+'%</strong></div><div class="benchmark-track"><div class="benchmark-fill" style="width:'+(r.w*100)+'%"></div>'+ci+'</div></div>';
+      }).join('')+'<div style="display:flex;justify-content:space-between;color:var(--muted);font:500 9px JetBrains Mono"><span>0%</span><span>50% parity</span><span>100%</span></div>';
+    }
+
+    function renderMomentum(selected){
+      const order=['3m','6m','12m'];
+      document.getElementById('momentumBars').innerHTML=order.map(function(k){
+        const r=momentum[k], val=r.annual*100, width=Math.min(45,Math.abs(r.annual)/.015*45);
+        return '<div class="momentum-row" style="'+(k===selected?'padding:10px;border:1px solid rgba(6,182,212,.28);border-radius:4px;background:rgba(6,182,212,.04)':'')+'"><div class="bar-head"><strong style="color:var(--text)">'+k.replace('m',' months')+(k==='6m'?' · baseline':'')+'</strong><strong style="color:'+(val>=0?'var(--primary2)':'var(--red2)')+'">'+(val>=0?'+':'')+val.toFixed(2)+'%</strong></div><div class="mom-track"><div class="mom-bar '+(val>=0?'pos':'neg')+'" style="width:'+width+'%"></div></div><div style="display:flex;justify-content:space-between;margin-top:4px;color:var(--muted);font:500 9px JetBrains Mono"><span>'+(r.lo*100).toFixed(2)+'% monthly CI low</span><span>'+(r.hi*100).toFixed(2)+'% high</span></div></div>';
+      }).join('');
+      const r=momentum[selected];
+      let regime = selected==='6m'
+        ? '<div class="ev"><div class="ev-head"><span>Rates rising regime</span></div><div class="ev-value" style="color:var(--primary2)">+0.82% annual</div><div class="card-sub">Not statistically significant</div></div><div class="ev"><div class="ev-head"><span>Rates falling regime</span></div><div class="ev-value" style="color:var(--red2)">-3.14% annual</div><div class="card-sub">Not statistically significant</div></div>'
+        : '<div class="ev"><div class="card-sub">Regime-specific estimates are reported for the six-month baseline specification.</div></div>';
+      document.getElementById('momentumDetail').innerHTML='<div class="ev"><div class="ev-head"><span>Annualized spread</span></div><div class="ev-value" style="color:'+(r.annual>=0?'var(--primary2)':'var(--red2)')+'">'+(r.annual>=0?'+':'')+(r.annual*100).toFixed(2)+'%</div><div class="card-sub">'+r.n+' monthly observations</div></div><div class="ev"><div class="ev-head"><span>95% block-bootstrap CI</span></div><div class="ev-value">'+(r.lo*100).toFixed(2)+'% to +'+(r.hi*100).toFixed(2)+'%</div><div class="card-sub">Monthly mean · interval crosses zero</div></div>'+regime;
+    }
+
+    document.querySelectorAll('#riskMetric button').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        document.querySelectorAll('#riskMetric button').forEach(function(x){x.classList.remove('active')});
+        btn.classList.add('active');renderRisk(btn.dataset.metric);
+      });
+    });
+    document.getElementById('dcaHorizon').addEventListener('change',function(e){renderDca(e.target.value)});
+    document.getElementById('benchmarkWindow').addEventListener('change',function(e){renderBenchmark(e.target.value)});
+    document.getElementById('momentumFormation').addEventListener('change',function(e){renderMomentum(e.target.value)});
+    document.querySelectorAll('[data-jump]').forEach(function(el){el.addEventListener('click',function(){document.getElementById(el.dataset.jump).scrollIntoView({behavior:'smooth'})})});
+
+    const navLinks=[].slice.call(document.querySelectorAll('.nav a[data-section]'));
+    const sections=navLinks.map(function(a){return document.getElementById(a.dataset.section)}).filter(Boolean);
+    const observer=new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          navLinks.forEach(function(a){a.classList.toggle('active',a.dataset.section===entry.target.id)});
+        }
+      });
+    },{rootMargin:'-72px 0px -70% 0px',threshold:.05});
+    sections.forEach(function(s){observer.observe(s)});
+
+    renderRisk('sharpe');renderRanking();renderRegime();renderDca('20y');renderBenchmark('5y');renderMomentum('6m');
+  </script>
+</body>
+</html>
